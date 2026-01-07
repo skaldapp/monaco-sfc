@@ -1,0 +1,76 @@
+{
+  "$schema": "https://www.schemastore.org/package",
+  "name": "@vuebro/monaco-sfc",
+  "version": "1.0.64",
+  "description": "A Monaco Editor language server for Vue Single File Components (SFC) providing syntax highlighting, IntelliSense, error detection, and more",
+  "keywords": [
+    "vue",
+    "monaco-editor",
+    "sfc",
+    "single-file-components",
+    "vue-language-server",
+    "editor",
+    "syntax-highlighting",
+    "intellisense",
+    "typescript",
+    "javascript",
+    "volar",
+    "language-service"
+  ],
+  "homepage": "https://github.com/vuebro/monaco-sfc#readme",
+  "bugs": {
+    "url": "https://github.com/vuebro/monaco-sfc/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vuebro/monaco-sfc.git"
+  },
+  "license": "AGPL-3.0-only",
+  "author": "Jerry Bruwes <jbruwes@gmail.com> (https://jbruwes.github.io)",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./*": {
+      "import": "./dist/*.js",
+      "require": "./dist/*.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc && vite build",
+    "lint": "eslint ."
+  },
+  "prettier": "@vuebro/configs/prettierrc",
+  "dependencies": {
+    "@remote-dom/polyfill": "^1.5.1",
+    "@volar/jsdelivr": "^2.4.27",
+    "@volar/monaco": "^2.4.27",
+    "@vue/language-core": "~3.1.8",
+    "@vue/language-service": "~3.1.8",
+    "@vue/typescript-plugin": "~3.1.8",
+    "markdown-it": "^14.1.0",
+    "monaco-editor": "0.52.2",
+    "typescript": "^5.9.3",
+    "volar-service-typescript": "^0.0.68",
+    "volar-service-yaml": "^0.0.68",
+    "vscode-languageserver-protocol": "^3.17.5",
+    "vscode-uri": "^3.1.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^29.0.0",
+    "@types/markdown-it": "^14.1.2",
+    "@types/node": "^25.0.3",
+    "@vuebro/configs": "^1.2.34",
+    "eslint": "^9.39.2",
+    "jsonc-parser": "^3.3.1",
+    "path-browserify": "^1.0.1",
+    "vite": "^7.3.0"
+  }
+}

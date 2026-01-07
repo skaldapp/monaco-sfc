@@ -1,7 +1,7 @@
 {
   "$schema": "https://www.schemastore.org/package",
   "name": "@skaldapp/monaco-sfc",
-  "version": "1.0.66",
+  "version": "1.0.67",
   "description": "A Monaco Editor language server for Vue Single File Components (SFC) providing syntax highlighting, IntelliSense, error detection, and more",
   "keywords": [
     "vue",

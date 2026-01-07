@@ -1,4 +1,4 @@
-# @vuebro/monaco-sfc
+# @skaldapp/monaco-sfc
 
 A Monaco Editor language server for Vue Single File Components (SFC). This library provides Vue language support for the Monaco editor, offering rich editing experiences with syntax highlighting, IntelliSense, error detection, and more for Vue SFCs.
 
@@ -16,13 +16,13 @@ A Monaco Editor language server for Vue Single File Components (SFC). This libra
 ## Installation
 
 ```bash
-npm install @vuebro/monaco-sfc
+npm install @skaldapp/monaco-sfc
 ```
 
 ## Usage
 
 ```javascript
-import initMonacoSFC from "@vuebro/monaco-sfc";
+import initMonacoSFC from "@skaldapp/monaco-sfc";
 
 // Initialize with your Monaco instance
 initMonacoSFC(monaco);

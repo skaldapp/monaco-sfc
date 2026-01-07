@@ -1,6 +1,6 @@
 {
   "$schema": "https://www.schemastore.org/package",
-  "name": "@vuebro/monaco-sfc",
+  "name": "@skaldapp/monaco-sfc",
   "version": "1.0.64",
   "description": "A Monaco Editor language server for Vue Single File Components (SFC) providing syntax highlighting, IntelliSense, error detection, and more",
   "keywords": [
@@ -17,13 +17,13 @@
     "volar",
     "language-service"
   ],
-  "homepage": "https://github.com/vuebro/monaco-sfc#readme",
+  "homepage": "https://github.com/skaldapp/monaco-sfc#readme",
   "bugs": {
-    "url": "https://github.com/vuebro/monaco-sfc/issues"
+    "url": "https://github.com/skaldapp/monaco-sfc/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vuebro/monaco-sfc.git"
+    "url": "git+https://github.com/skaldapp/monaco-sfc.git"
   },
   "license": "AGPL-3.0-only",
   "author": "Jerry Bruwes <jbruwes@gmail.com> (https://jbruwes.github.io)",
@@ -47,7 +47,7 @@
     "build": "tsc && vite build",
     "lint": "eslint ."
   },
-  "prettier": "@vuebro/configs/prettierrc",
+  "prettier": "@skaldapp/configs/prettierrc",
   "dependencies": {
     "@remote-dom/polyfill": "^1.5.1",
     "@volar/jsdelivr": "^2.4.27",
@@ -65,9 +65,9 @@
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.0",
+    "@skaldapp/configs": "^1.2.34",
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^25.0.3",
-    "@vuebro/configs": "^1.2.34",
     "eslint": "^9.39.2",
     "jsonc-parser": "^3.3.1",
     "path-browserify": "^1.0.1",

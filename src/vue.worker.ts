@@ -49,7 +49,7 @@ const { options: compilerOptions } = convertCompilerOptionsFromJson(
 
 /* -------------------------------------------------------------------------- */
 
-const asFileName = ({ path }: { path: URI["path"] }) => path,
+const asFileName = ({ path }: URI) => path,
   asUri = (fileName: string) => URI.file(fileName),
   fs = createNpmFileSystem(),
   workspaceFolders = [URI.file("/")],
@@ -63,7 +63,8 @@ const asFileName = ({ path }: { path: URI["path"] }) => path,
       asFileName,
     ),
   ],
-  semanticPlugin = createTypeScriptSemanticPlugin(typescript);
+  semanticPlugin = createTypeScriptSemanticPlugin(typescript),
+  uriConverter = { asFileName, asUri };
 
 /* -------------------------------------------------------------------------- */
 
@@ -271,7 +272,7 @@ self.onmessage = () => {
         }).filter(({ name }) => !name?.startsWith("vue-template")),
       ],
       typescript,
-      uriConverter: { asFileName, asUri },
+      uriConverter,
       workerContext,
     });
     return workerLanguageService;

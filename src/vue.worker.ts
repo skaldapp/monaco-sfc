@@ -34,41 +34,29 @@ import { URI } from "vscode-uri";
 
 /* -------------------------------------------------------------------------- */
 
-const { options: compilerOptions } = convertCompilerOptionsFromJson(
-  {
-    allowImportingTsExtensions: true,
-    allowJs: true,
-    checkJs: true,
-    jsx: "Preserve",
-    module: "ESNext",
-    moduleResolution: "Bundler",
-    target: "ESNext",
-  },
-  "",
-);
-
-/* -------------------------------------------------------------------------- */
+const ctime = Date.now(),
+  globalDeclarations = `declare global {
+  const $frontmatter: Record<string, any>;
+  const $id: string;
+}
+declare module 'vue' {
+  interface ComponentCustomProperties {
+    $frontmatter: Record<string, any>;
+    $id: string;
+  }
+}
+export {};`,
+  mtime = ctime,
+  npmFileSystem = createNpmFileSystem(),
+  semanticPlugin = createTypeScriptSemanticPlugin(typescript),
+  size = globalDeclarations.length,
+  type = 1,
+  vueCompilerOptions = getDefaultCompilerOptions(),
+  workspaceFolders = [URI.file("/")];
 
 const asFileName = ({ path }: URI) => path,
   asUri = (fileName: string) => URI.file(fileName),
-  fs = createNpmFileSystem(),
-  workspaceFolders = [URI.file("/")],
-  env = { fs, workspaceFolders },
-  vueCompilerOptions = getDefaultCompilerOptions(),
-  languagePlugins = [
-    createVueLanguagePlugin(
-      typescript,
-      compilerOptions,
-      vueCompilerOptions,
-      asFileName,
-    ),
-  ],
-  semanticPlugin = createTypeScriptSemanticPlugin(typescript),
-  uriConverter = { asFileName, asUri };
-
-/* -------------------------------------------------------------------------- */
-
-const create = (context: LanguageServiceContext) => {
+  create = (context: LanguageServiceContext) => {
     const pluginInstance = semanticPlugin.create(context),
       languageService = pluginInstance.provide["typescript/languageService"](),
       proxy = postprocessLanguageService(
@@ -93,6 +81,14 @@ const create = (context: LanguageServiceContext) => {
     });
     return pluginInstance;
   },
+  readFile = (uri: URI) =>
+    uri.path.endsWith("global.d.ts")
+      ? globalDeclarations
+      : npmFileSystem.readFile(uri),
+  stat = (uri: URI) =>
+    uri.path.endsWith("global.d.ts")
+      ? { ctime, mtime, size, type }
+      : npmFileSystem.stat(uri),
   useContext = (
     fileName: string,
     { languageService: { context } }: WorkerLanguageService,
@@ -115,6 +111,36 @@ const create = (context: LanguageServiceContext) => {
       virtualCode,
     };
   };
+
+/* -------------------------------------------------------------------------- */
+
+const { options: compilerOptions } = convertCompilerOptionsFromJson(
+  {
+    allowImportingTsExtensions: true,
+    allowJs: true,
+    checkJs: true,
+    jsx: "Preserve",
+    module: "ESNext",
+    moduleResolution: "Bundler",
+    target: "ESNext",
+    types: ["global"],
+  },
+  "",
+);
+
+/* -------------------------------------------------------------------------- */
+
+const fs = { ...npmFileSystem, readFile, stat },
+  env = { fs, workspaceFolders },
+  languagePlugins = [
+    createVueLanguagePlugin(
+      typescript,
+      compilerOptions,
+      vueCompilerOptions,
+      asFileName,
+    ),
+  ],
+  uriConverter = { asFileName, asUri };
 
 /* -------------------------------------------------------------------------- */
 

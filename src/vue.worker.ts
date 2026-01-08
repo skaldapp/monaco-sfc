@@ -1,8 +1,8 @@
 import type {
-  LanguageServicePlugin,
+  Language,
+  LanguageServiceContext,
   WorkerLanguageService,
 } from "@volar/monaco/worker";
-import type { Language } from "@vue/language-service";
 import type { worker } from "monaco-editor";
 
 import { Window } from "@remote-dom/polyfill";
@@ -10,25 +10,21 @@ import { createNpmFileSystem } from "@volar/jsdelivr";
 import { createTypeScriptWorkerLanguageService } from "@volar/monaco/worker";
 import {
   createVueLanguagePlugin,
-  generateGlobalTypes,
   getDefaultCompilerOptions,
-  getGlobalTypesFileName,
   VueVirtualCode,
 } from "@vue/language-core";
 import { createVueLanguageServicePlugins } from "@vue/language-service";
 import { postprocessLanguageService } from "@vue/typescript-plugin/lib/common";
 import { collectExtractProps } from "@vue/typescript-plugin/lib/requests/collectExtractProps";
 import { getComponentDirectives } from "@vue/typescript-plugin/lib/requests/getComponentDirectives";
-import { getComponentEvents } from "@vue/typescript-plugin/lib/requests/getComponentEvents";
+import { getComponentMeta } from "@vue/typescript-plugin/lib/requests/getComponentMeta";
 import { getComponentNames } from "@vue/typescript-plugin/lib/requests/getComponentNames";
-import { getComponentProps } from "@vue/typescript-plugin/lib/requests/getComponentProps";
 import { getComponentSlots } from "@vue/typescript-plugin/lib/requests/getComponentSlots";
 import { getElementAttrs } from "@vue/typescript-plugin/lib/requests/getElementAttrs";
 import { getElementNames } from "@vue/typescript-plugin/lib/requests/getElementNames";
 import { getImportPathForFile } from "@vue/typescript-plugin/lib/requests/getImportPathForFile";
 import { isRefAtPosition } from "@vue/typescript-plugin/lib/requests/isRefAtPosition";
 import { resolveModuleName } from "@vue/typescript-plugin/lib/requests/resolveModuleName";
-import markdownit from "markdown-it";
 import { initialize } from "monaco-editor/esm/vs/editor/editor.worker";
 import typescript, { convertCompilerOptionsFromJson } from "typescript";
 import { create as createTypeScriptDirectiveCommentPlugin } from "volar-service-typescript/lib/plugins/directiveComment";
@@ -36,38 +32,74 @@ import { create as createTypeScriptSemanticPlugin } from "volar-service-typescri
 import { MarkupContent } from "vscode-languageserver-protocol";
 import { URI } from "vscode-uri";
 
-/** Don't remove! It's prevent emoji errors. (Non-UTF characters in the code) */
-Window.setGlobal(new Window());
+/* -------------------------------------------------------------------------- */
+
+const { options: compilerOptions } = convertCompilerOptionsFromJson(
+  {
+    allowImportingTsExtensions: true,
+    allowJs: true,
+    checkJs: true,
+    jsx: "Preserve",
+    module: "ESNext",
+    moduleResolution: "Bundler",
+    target: "ESNext",
+  },
+  "",
+);
+
+/* -------------------------------------------------------------------------- */
 
 const asFileName = ({ path }: { path: URI["path"] }) => path,
   asUri = (fileName: string) => URI.file(fileName),
-  ctime = Date.now(),
+  fs = createNpmFileSystem(),
+  workspaceFolders = [URI.file("/")],
+  env = { fs, workspaceFolders },
   vueCompilerOptions = getDefaultCompilerOptions(),
-  globalTypes = `${generateGlobalTypes(vueCompilerOptions)}
-declare global {
-    const $frontmatter: Record<string, any>;
-    const $id: string;
-}
-declare module 'vue' {
-    interface ComponentCustomProperties {
-      $frontmatter: Record<string, any>;
-      $id: string;
-    }
-}`,
-  globalTypesPath =
-    "/node_modules/" + getGlobalTypesFileName(vueCompilerOptions),
-  md = markdownit(),
-  npmFileSystem = createNpmFileSystem(),
-  semanticPlugin = createTypeScriptSemanticPlugin(typescript),
+  languagePlugins = [
+    createVueLanguagePlugin(
+      typescript,
+      compilerOptions,
+      vueCompilerOptions,
+      asFileName,
+    ),
+  ],
+  semanticPlugin = createTypeScriptSemanticPlugin(typescript);
+
+/* -------------------------------------------------------------------------- */
+
+const create = (context: LanguageServiceContext) => {
+    const pluginInstance = semanticPlugin.create(context),
+      languageService = pluginInstance.provide["typescript/languageService"](),
+      proxy = postprocessLanguageService(
+        typescript,
+        context.language,
+        languageService,
+        vueCompilerOptions,
+        asUri,
+      ),
+      getCodeFixesAtPosition = proxy.getCodeFixesAtPosition.bind(proxy),
+      getCompletionEntryDetails = proxy.getCompletionEntryDetails.bind(proxy),
+      getCompletionsAtPosition = proxy.getCompletionsAtPosition.bind(proxy),
+      getDefinitionAndBoundSpan = proxy.getDefinitionAndBoundSpan.bind(proxy),
+      getQuickInfoAtPosition = proxy.getQuickInfoAtPosition.bind(proxy);
+    pluginInstance.provide["typescript/languageService"] = () => ({
+      ...languageService,
+      getCodeFixesAtPosition,
+      getCompletionEntryDetails,
+      getCompletionsAtPosition,
+      getDefinitionAndBoundSpan,
+      getQuickInfoAtPosition,
+    });
+    return pluginInstance;
+  },
   useContext = (
     fileName: string,
     { languageService: { context } }: WorkerLanguageService,
   ) => {
     const { language } = context;
-    const languageServiceHost = context.inject(
-        "typescript/languageServiceHost",
-      ),
-      program = context.inject("typescript/languageService").getProgram(),
+    const languageService = context.inject("typescript/languageService"),
+      languageServiceHost = context.inject("typescript/languageServiceHost"),
+      program = languageService.getProgram(),
       sourceScript = language.scripts.get(asUri(fileName)),
       virtualCode =
         sourceScript?.generated?.root instanceof VueVirtualCode
@@ -80,81 +112,25 @@ declare module 'vue' {
       sourceScript,
       virtualCode,
     };
-  },
-  { options: compilerOptions } = convertCompilerOptionsFromJson(
-    {
-      allowImportingTsExtensions: true,
-      allowJs: true,
-      checkJs: true,
-      jsx: "Preserve",
-      module: "ESNext",
-      moduleResolution: "Bundler",
-      target: "ESNext",
-    },
-    "",
-  );
+  };
 
-const fs = {
-  ...npmFileSystem,
-  readFile: (uri: URI) =>
-    uri.path === globalTypesPath ? globalTypes : npmFileSystem.readFile(uri),
-  stat: (uri: URI) =>
-    uri.path === globalTypesPath
-      ? { ctime, mtime: ctime, size: globalTypes.length, type: 1 }
-      : npmFileSystem.stat(uri),
-};
+/* -------------------------------------------------------------------------- */
+
+/** Don't remove! It's prevent emoji errors. (Non-UTF characters in the code) */
+Window.setGlobal(new Window());
 
 vueCompilerOptions.vitePressExtensions.push(".md");
-vueCompilerOptions.globalTypesPath = () => globalTypesPath;
 
 self.onmessage = () => {
   initialize((workerContext: worker.IWorkerContext) => {
     const workerLanguageService = createTypeScriptWorkerLanguageService({
       compilerOptions,
-      env: { fs, workspaceFolders: [URI.file("/")] },
-      languagePlugins: [
-        createVueLanguagePlugin(
-          typescript,
-          compilerOptions,
-          vueCompilerOptions,
-          asFileName,
-        ),
-      ],
+      env,
+      languagePlugins,
       languageServicePlugins: [
-        {
-          ...semanticPlugin,
-          create: (context) => {
-            const pluginInstance = semanticPlugin.create(context),
-              languageService =
-                pluginInstance.provide["typescript/languageService"](),
-              proxy = postprocessLanguageService(
-                typescript,
-                context.language as Language,
-                languageService,
-                vueCompilerOptions,
-                asUri,
-              ),
-              vueLanguageService = {
-                getCodeFixesAtPosition:
-                  proxy.getCodeFixesAtPosition.bind(proxy),
-                getCompletionEntryDetails:
-                  proxy.getCompletionEntryDetails.bind(proxy),
-                getCompletionsAtPosition:
-                  proxy.getCompletionsAtPosition.bind(proxy),
-                getDefinitionAndBoundSpan:
-                  proxy.getDefinitionAndBoundSpan.bind(proxy),
-                getQuickInfoAtPosition:
-                  proxy.getQuickInfoAtPosition.bind(proxy),
-              };
-            pluginInstance.provide["typescript/languageService"] = () => ({
-              ...languageService,
-              ...vueLanguageService,
-            });
-            return pluginInstance;
-          },
-        },
+        { ...semanticPlugin, create },
         createTypeScriptDirectiveCommentPlugin(),
-        ...(createVueLanguageServicePlugins(typescript, {
+        ...createVueLanguageServicePlugins(typescript, {
           collectExtractProps(fileName, templateCodeRange) {
             const { language, program, sourceScript, virtualCode } = useContext(
               fileName,
@@ -165,7 +141,7 @@ self.onmessage = () => {
               virtualCode &&
               collectExtractProps(
                 typescript,
-                language as Language,
+                language,
                 program,
                 sourceScript,
                 virtualCode,
@@ -178,14 +154,21 @@ self.onmessage = () => {
             const { program } = useContext(fileName, workerLanguageService);
             return getComponentDirectives(typescript, program, fileName);
           },
-          getComponentEvents: (fileName, tag) => {
-            const { program, virtualCode } = useContext(
+          getComponentMeta: (fileName, tag) => {
+            const { language, program, virtualCode } = useContext(
               fileName,
               workerLanguageService,
             );
             return (
               virtualCode &&
-              getComponentEvents(typescript, program, virtualCode, tag)
+              getComponentMeta(
+                typescript,
+                program,
+                language as unknown as Language<string>,
+                program.getSourceFile(fileName),
+                virtualCode,
+                tag,
+              )
             );
           },
           getComponentNames: (fileName) => {
@@ -195,16 +178,6 @@ self.onmessage = () => {
             );
             return (
               virtualCode && getComponentNames(typescript, program, virtualCode)
-            );
-          },
-          getComponentProps: (fileName, tag) => {
-            const { program, virtualCode } = useContext(
-              fileName,
-              workerLanguageService,
-            );
-            return (
-              virtualCode &&
-              getComponentProps(typescript, program, virtualCode, tag)
             );
           },
           getComponentSlots(fileName) {
@@ -219,11 +192,11 @@ self.onmessage = () => {
           getDocumentHighlights: () => undefined,
           getElementAttrs: (fileName, tag) => {
             const { program } = useContext(fileName, workerLanguageService);
-            return getElementAttrs(typescript, program, tag);
+            return getElementAttrs(typescript, program, fileName, tag);
           },
           getElementNames: (fileName) => {
             const { program } = useContext(fileName, workerLanguageService);
-            return getElementNames(typescript, program);
+            return getElementNames(typescript, program, fileName);
           },
           getEncodedSemanticClassifications: () => undefined,
           getImportPathForFile: (fileName, incomingFileName, preferences) => {
@@ -247,19 +220,21 @@ self.onmessage = () => {
                 position,
               )) ?? {};
             return (
-              contents &&
-              md.render(
-                MarkupContent.is(contents)
-                  ? contents.value
-                  : (Array.isArray(contents) ? contents : [contents])
-                      .map((markedString) =>
-                        typeof markedString === "string"
-                          ? markedString
-                          : `\`\`\`${markedString.language}\n${markedString.value}\n\`\`\``,
-                      )
-                      .join("\n"),
-              )
-            );
+              contents && MarkupContent.is(contents)
+                ? contents.value
+                : (Array.isArray(contents) ? contents : [contents ?? ""])
+                    .map((markedString) =>
+                      typeof markedString === "string"
+                        ? markedString
+                        : markedString.value,
+                    )
+                    .join("\n")
+            )
+              .replace(/```typescript/g, "")
+              .replace(/```/g, "")
+              .replace(/---/g, "")
+              .trim()
+              .replace(/\n+/g, " | ");
           },
           isRefAtPosition(fileName, position) {
             const { language, program, sourceScript, virtualCode } = useContext(
@@ -271,7 +246,7 @@ self.onmessage = () => {
               virtualCode &&
               isRefAtPosition(
                 typescript,
-                language as Language,
+                language,
                 program,
                 sourceScript,
                 virtualCode,
@@ -292,9 +267,7 @@ self.onmessage = () => {
               moduleName,
             );
           },
-        }).filter(
-          ({ name }) => !name?.startsWith("vue-template"),
-        ) as LanguageServicePlugin[]),
+        }).filter(({ name }) => !name?.startsWith("vue-template")),
       ],
       typescript,
       uriConverter: { asFileName, asUri },

@@ -97,9 +97,10 @@ const create = (context: LanguageServiceContext) => {
     { languageService: { context } }: WorkerLanguageService,
   ) => {
     const { language } = context;
-    const languageService = context.inject("typescript/languageService"),
-      languageServiceHost = context.inject("typescript/languageServiceHost"),
-      program = languageService.getProgram(),
+    const languageServiceHost = context.inject(
+        "typescript/languageServiceHost",
+      ),
+      program = context.inject("typescript/languageService").getProgram(),
       sourceScript = language.scripts.get(asUri(fileName)),
       virtualCode =
         sourceScript?.generated?.root instanceof VueVirtualCode

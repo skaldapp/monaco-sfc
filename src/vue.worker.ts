@@ -32,8 +32,6 @@ import { create as createTypeScriptSemanticPlugin } from "volar-service-typescri
 import { MarkupContent } from "vscode-languageserver-protocol";
 import { URI } from "vscode-uri";
 
-/* -------------------------------------------------------------------------- */
-
 const ctime = Date.now(),
   globalDeclarations = `declare global {
   const $frontmatter: Record<string, any>;
@@ -53,7 +51,6 @@ export {};`,
   type = 1,
   vueCompilerOptions = getDefaultCompilerOptions(),
   workspaceFolders = [URI.file("/")];
-
 const asFileName = ({ path }: URI) => path,
   asUri = (fileName: string) => URI.file(fileName),
   create = (context: LanguageServiceContext) => {
@@ -89,6 +86,9 @@ const asFileName = ({ path }: URI) => path,
     uri.path.endsWith("global.d.ts")
       ? { ctime, mtime, size, type }
       : npmFileSystem.stat(uri),
+  fs = { ...npmFileSystem, readFile, stat },
+  env = { fs, workspaceFolders },
+  uriConverter = { asFileName, asUri },
   useContext = (
     fileName: string,
     { languageService: { context } }: WorkerLanguageService,
@@ -110,39 +110,28 @@ const asFileName = ({ path }: URI) => path,
       sourceScript,
       virtualCode,
     };
-  };
-
-/* -------------------------------------------------------------------------- */
-
-const { options: compilerOptions } = convertCompilerOptionsFromJson(
-  {
-    allowImportingTsExtensions: true,
-    allowJs: true,
-    checkJs: true,
-    jsx: "Preserve",
-    module: "ESNext",
-    moduleResolution: "Bundler",
-    target: "ESNext",
-    types: ["global"],
   },
-  "",
-);
-
-/* -------------------------------------------------------------------------- */
-
-const fs = { ...npmFileSystem, readFile, stat },
-  env = { fs, workspaceFolders },
-  languagePlugins = [
-    createVueLanguagePlugin(
-      typescript,
-      compilerOptions,
-      vueCompilerOptions,
-      asFileName,
-    ),
-  ],
-  uriConverter = { asFileName, asUri };
-
-/* -------------------------------------------------------------------------- */
+  { options: compilerOptions } = convertCompilerOptionsFromJson(
+    {
+      allowImportingTsExtensions: true,
+      allowJs: true,
+      checkJs: true,
+      jsx: "Preserve",
+      module: "ESNext",
+      moduleResolution: "Bundler",
+      target: "ESNext",
+      types: ["global"],
+    },
+    "",
+  );
+const languagePlugins = [
+  createVueLanguagePlugin(
+    typescript,
+    compilerOptions,
+    vueCompilerOptions,
+    asFileName,
+  ),
+];
 
 /** Don't remove! It's prevent emoji errors. (Non-UTF characters in the code) */
 Window.setGlobal(new Window());

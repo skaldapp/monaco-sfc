@@ -49,6 +49,7 @@
   },
   "prettier": "@skaldapp/configs/prettierrc",
   "dependencies": {
+    "@nuxtlabs/monarch-mdc": "^0.8.1",
     "@remote-dom/polyfill": "^1.5.1",
     "@volar/jsdelivr": "^2.4.27",
     "@volar/monaco": "^2.4.27",

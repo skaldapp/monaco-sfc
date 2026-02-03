@@ -1,8 +1,9 @@
 import type {
-  Language,
   LanguageServiceContext,
+  LanguageServicePlugin,
   WorkerLanguageService,
 } from "@volar/monaco/worker";
+import type { Language } from "@vue/language-core";
 import type { worker } from "monaco-editor";
 
 import { Window } from "@remote-dom/polyfill";
@@ -58,7 +59,7 @@ const asFileName = ({ path }: URI) => path,
       languageService = pluginInstance.provide["typescript/languageService"](),
       proxy = postprocessLanguageService(
         typescript,
-        context.language,
+        context.language as Language,
         languageService,
         vueCompilerOptions,
         asUri,
@@ -147,7 +148,7 @@ self.onmessage = () => {
       languageServicePlugins: [
         { ...semanticPlugin, create },
         createTypeScriptDirectiveCommentPlugin(),
-        ...createVueLanguageServicePlugins(typescript, {
+        ...(createVueLanguageServicePlugins(typescript, {
           collectExtractProps(fileName, templateCodeRange) {
             const { language, program, sourceScript, virtualCode } = useContext(
               fileName,
@@ -158,7 +159,7 @@ self.onmessage = () => {
               virtualCode &&
               collectExtractProps(
                 typescript,
-                language,
+                language as Language,
                 program,
                 sourceScript,
                 virtualCode,
@@ -263,7 +264,7 @@ self.onmessage = () => {
               virtualCode &&
               isRefAtPosition(
                 typescript,
-                language,
+                language as Language,
                 program,
                 sourceScript,
                 virtualCode,
@@ -284,7 +285,9 @@ self.onmessage = () => {
               moduleName,
             );
           },
-        }).filter(({ name }) => !name?.startsWith("vue-template")),
+        }).filter(
+          ({ name }) => !name?.startsWith("vue-template"),
+        ) as LanguageServicePlugin[]),
       ],
       typescript,
       uriConverter,

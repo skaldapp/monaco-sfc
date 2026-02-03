@@ -2,6 +2,11 @@ import type { WorkerLanguageService } from "@volar/monaco/worker";
 import type Monaco from "monaco-editor";
 
 import {
+  foldingProvider,
+  // formatter,
+  language,
+} from "@nuxtlabs/monarch-mdc";
+import {
   activateAutoInsertion,
   activateMarkers,
   registerProviders,
@@ -18,6 +23,37 @@ export default (monaco: typeof Monaco) => {
       });
 
   monaco.languages.register({ id: "vue" });
+
+  monaco.languages.setMonarchTokensProvider("markdown", language);
+  // monaco.languages.registerDocumentFormattingEditProvider("mdc", {
+  //   provideDocumentFormattingEdits: (model) => [
+  //     {
+  //       range: model.getFullModelRange(),
+  //       text: formatter(model.getValue(), { tabSize }),
+  //     },
+  //   ],
+  // });
+  // monaco.languages.registerOnTypeFormattingEditProvider("mdc", {
+  //   autoFormatTriggerCharacters: ["\n"],
+  //   provideOnTypeFormattingEdits: (model, position) =>
+  //     model
+  //       .getLineContent(position.lineNumber - 1)
+  //       .trim()
+  //       .endsWith("---")
+  //       ? []
+  //       : [
+  //           {
+  //             range: model.getFullModelRange(),
+  //             text: formatter(model.getValue(), {
+  //               isFormatOnType: true,
+  //               tabSize,
+  //             }),
+  //           },
+  //         ],
+  // });
+  monaco.languages.registerFoldingRangeProvider("markdown", {
+    provideFoldingRanges: (model) => foldingProvider(model),
+  });
 
   void registerProviders(worker, langs, getSyncUris, monaco.languages);
   activateMarkers(worker, langs, "vue", getSyncUris, monaco.editor);

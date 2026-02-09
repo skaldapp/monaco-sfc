@@ -240,7 +240,8 @@ self.onmessage = () => {
             return (
               contents && MarkupContent.is(contents)
                 ? contents.value
-                : (Array.isArray(contents) ? contents : [contents ?? ""])
+                : [contents ?? ""]
+                    .flat()
                     .map((markedString) =>
                       typeof markedString === "string"
                         ? markedString

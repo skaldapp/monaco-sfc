@@ -27,6 +27,7 @@
   },
   "license": "AGPL-3.0-only",
   "author": "Jerry Bruwes <jbruwes@gmail.com> (https://jbruwes.github.io)",
+  "sideEffects": false,
   "type": "module",
   "exports": {
     ".": {
@@ -53,9 +54,9 @@
     "@remote-dom/polyfill": "^1.5.1",
     "@volar/jsdelivr": "^2.4.28",
     "@volar/monaco": "^2.4.28",
-    "@vue/language-core": "^3.2.4",
-    "@vue/language-service": "^3.2.4",
-    "@vue/typescript-plugin": "^3.2.4",
+    "@vue/language-core": "^3.2.5",
+    "@vue/language-service": "^3.2.5",
+    "@vue/typescript-plugin": "^3.2.5",
     "monaco-editor": "0.52.2",
     "typescript": "^5.9.3",
     "volar-service-typescript": "^0.0.68",
@@ -64,10 +65,10 @@
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.0",
-    "@skaldapp/configs": "^1.2.59",
+    "@skaldapp/configs": "^1.2.63",
     "@types/markdown-it": "^14.1.2",
-    "@types/node": "^25.2.3",
-    "eslint": "^9.39.2",
+    "@types/node": "^25.3.0",
+    "eslint": "^9.39.3",
     "jsonc-parser": "^3.3.1",
     "path-browserify": "^1.0.1",
     "vite": "^7.3.1"

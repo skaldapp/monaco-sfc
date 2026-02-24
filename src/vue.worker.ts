@@ -1,6 +1,5 @@
 import type {
   LanguageServiceContext,
-  LanguageServicePlugin,
   WorkerLanguageService,
 } from "@volar/monaco/worker";
 import type { Language } from "@vue/language-core";
@@ -148,7 +147,7 @@ self.onmessage = () => {
       languageServicePlugins: [
         { ...semanticPlugin, create },
         createTypeScriptDirectiveCommentPlugin(),
-        ...(createVueLanguageServicePlugins(typescript, {
+        ...createVueLanguageServicePlugins(typescript, {
           collectExtractProps(fileName, templateCodeRange) {
             const { language, program, sourceScript, virtualCode } = useContext(
               fileName,
@@ -286,9 +285,7 @@ self.onmessage = () => {
               moduleName,
             );
           },
-        }).filter(
-          ({ name }) => !name?.startsWith("vue-template"),
-        ) as LanguageServicePlugin[]),
+        }).filter(({ name }) => !name?.startsWith("vue-template")),
       ],
       typescript,
       uriConverter,

@@ -65,7 +65,7 @@
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.0",
-    "@skaldapp/configs": "^1.2.63",
+    "@skaldapp/configs": "^1.2.64",
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^25.3.0",
     "eslint": "^9.39.3",

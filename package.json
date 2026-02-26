@@ -59,15 +59,15 @@
     "@vue/typescript-plugin": "^3.2.5",
     "monaco-editor": "0.52.2",
     "typescript": "^5.9.3",
-    "volar-service-typescript": "^0.0.68",
+    "volar-service-typescript": "^0.0.69",
     "vscode-languageserver-protocol": "^3.17.5",
     "vscode-uri": "^3.1.0"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.0",
-    "@skaldapp/configs": "^1.2.64",
+    "@skaldapp/configs": "^1.2.65",
     "@types/markdown-it": "^14.1.2",
-    "@types/node": "^25.3.0",
+    "@types/node": "^25.3.1",
     "eslint": "^9.39.3",
     "jsonc-parser": "^3.3.1",
     "path-browserify": "^1.0.1",

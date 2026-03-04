@@ -34,6 +34,9 @@ import { URI } from "vscode-uri";
 
 const ctime = Date.now(),
   globalDeclarations = `declare global {
+  interface Window {
+    __vue_app__: import("vue").App;
+  }
   const $frontmatter: Record<string, any>;
   const $id: string;
 }

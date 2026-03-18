@@ -175,7 +175,7 @@ self.onmessage = () => {
             return getComponentDirectives(typescript, program, fileName);
           },
           getComponentMeta: (fileName, tag) => {
-            const { language, program, virtualCode } = useContext(
+            const { language, program, sourceScript, virtualCode } = useContext(
               fileName,
               workerLanguageService,
             );
@@ -185,6 +185,7 @@ self.onmessage = () => {
                 typescript,
                 program,
                 language as unknown as Language<string>,
+                () => sourceScript,
                 program.getSourceFile(fileName),
                 virtualCode,
                 tag,

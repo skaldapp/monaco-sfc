@@ -33,6 +33,7 @@ import { MarkupContent } from "vscode-languageserver-protocol";
 import { URI } from "vscode-uri";
 
 const ctime = Date.now(),
+  global = "skaldapp",
   globalDeclarations = `declare global {
   interface Window {
     __vue_app__: import("vue").App;
@@ -82,11 +83,11 @@ const asFileName = ({ path }: URI) => path,
     return pluginInstance;
   },
   readFile = (uri: URI) =>
-    uri.path.endsWith("global.d.ts")
+    uri.path.endsWith(global) || uri.path.endsWith(`${global}.d.ts`)
       ? globalDeclarations
       : npmFileSystem.readFile(uri),
   stat = (uri: URI) =>
-    uri.path.endsWith("global.d.ts")
+    uri.path.endsWith(global) || uri.path.endsWith(`${global}.d.ts`)
       ? { ctime, mtime, size, type }
       : npmFileSystem.stat(uri),
   fs = { ...npmFileSystem, readFile, stat },
@@ -123,7 +124,7 @@ const asFileName = ({ path }: URI) => path,
       module: "ESNext",
       moduleResolution: "Bundler",
       target: "ESNext",
-      types: ["global"],
+      types: [global],
     },
     "",
   );

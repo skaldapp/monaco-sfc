@@ -71,6 +71,6 @@
     "eslint": "^10.1.0",
     "jsonc-parser": "^3.3.1",
     "path-browserify": "^1.0.1",
-    "vite": "^8.0.1"
+    "vite": "^7.3.1"
   }
 }

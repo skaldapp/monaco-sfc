@@ -7,8 +7,9 @@ const path = "path-browserify",
   entry = "src/vue.worker.ts",
   external = ["monaco-editor/esm/vs/editor/editor.worker"],
   fileName = "vue.worker",
+  minify = false,
   resolve = { alias },
-  rollupOptions = { external };
+  rolldownOptions = { external };
 
 export default mergeConfig(
   config,
@@ -16,7 +17,8 @@ export default mergeConfig(
     build: {
       emptyOutDir,
       lib: { entry, fileName, formats: ["es"] },
-      rollupOptions,
+      minify,
+      rolldownOptions,
     },
     resolve,
   }),

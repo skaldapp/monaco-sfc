@@ -58,14 +58,14 @@
     "@vue/language-service": "^3.2.6",
     "@vue/typescript-plugin": "^3.2.6",
     "monaco-editor": "0.52.2",
-    "typescript": "^5.9.3",
+    "typescript": "^6.0.2",
     "volar-service-typescript": "^0.0.70",
     "vscode-languageserver-protocol": "^3.17.5",
     "vscode-uri": "^3.1.0"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.2",
-    "@skaldapp/configs": "^1.2.80",
+    "@skaldapp/configs": "^1.2.81",
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^25.5.0",
     "eslint": "^10.1.0",

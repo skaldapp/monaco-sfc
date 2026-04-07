@@ -45,7 +45,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc && vite build",
+    "build": "tsc -p tsconfig.build.json && vite build",
     "lint": "eslint ."
   },
   "prettier": "@skaldapp/configs/prettierrc",
@@ -65,12 +65,12 @@
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.2",
-    "@skaldapp/configs": "^1.2.84",
+    "@skaldapp/configs": "^1.2.91",
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^25.5.2",
     "eslint": "^10.2.0",
     "jsonc-parser": "^3.3.1",
     "path-browserify": "^1.0.1",
-    "vite": "^8.0.3"
+    "vite": "^8.0.7"
   }
 }

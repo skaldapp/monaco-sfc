@@ -172,7 +172,7 @@ self.onmessage = () => {
               virtualCode &&
               collectExtractProps(
                 typescript,
-                language as Language,
+                language,
                 program,
                 sourceScript,
                 virtualCode,
@@ -195,7 +195,7 @@ self.onmessage = () => {
               getComponentMeta(
                 typescript,
                 program,
-                language as unknown as Language<string>,
+                language,
                 () => sourceScript,
                 program.getSourceFile(fileName),
                 virtualCode,
@@ -279,7 +279,7 @@ self.onmessage = () => {
               virtualCode &&
               isRefAtPosition(
                 typescript,
-                language as Language,
+                language,
                 program,
                 sourceScript,
                 virtualCode,

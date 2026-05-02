@@ -12,15 +12,12 @@ import {
   registerProviders,
 } from "@volar/monaco";
 
-export default (monaco: typeof Monaco) => {
+export default (monaco: typeof Monaco, worker: Worker) => {
   const getSyncUris = () => monaco.editor.getModels().map(({ uri }) => uri),
     langs = ["vue", "markdown"],
     // tabSize = 2,
-    worker: Monaco.editor.MonacoWebWorker<WorkerLanguageService> =
-      monaco.editor.createWebWorker({
-        label: "vue",
-        moduleId: "vs/language/vue/vueWorker",
-      });
+    webWorker: Monaco.editor.MonacoWebWorker<WorkerLanguageService> =
+      monaco.editor.createWebWorker({ worker });
 
   monaco.languages.register({ id: "vue" });
 
@@ -55,7 +52,7 @@ export default (monaco: typeof Monaco) => {
     provideFoldingRanges: (model) => foldingProvider(model),
   });
 
-  void registerProviders(worker, langs, getSyncUris, monaco.languages);
-  activateMarkers(worker, langs, "vue", getSyncUris, monaco.editor);
-  activateAutoInsertion(worker, langs, getSyncUris, monaco.editor);
+  void registerProviders(webWorker, langs, getSyncUris, monaco.languages);
+  activateMarkers(webWorker, langs, "vue", getSyncUris, monaco.editor);
+  activateAutoInsertion(webWorker, langs, getSyncUris, monaco.editor);
 };

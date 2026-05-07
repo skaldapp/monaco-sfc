@@ -26,7 +26,7 @@
     "url": "git+https://github.com/skaldapp/monaco-sfc.git"
   },
   "license": "AGPL-3.0-only",
-  "author": "Jerry Bruwes <jbruwes@gmail.com> (https://jbruwes.github.io)",
+  "author": "Jerry Bruwes <jbruwes@gmail.com>",
   "sideEffects": false,
   "type": "module",
   "exports": {

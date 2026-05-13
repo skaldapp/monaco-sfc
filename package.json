@@ -59,18 +59,18 @@
     "@vue/typescript-plugin": "^3.2.8",
     "monaco-editor": "0.52.2",
     "typescript": "^6.0.3",
-    "volar-service-typescript": "^0.0.70",
+    "volar-service-typescript": "^0.0.71",
     "vscode-languageserver-protocol": "^3.17.5",
     "vscode-uri": "^3.1.0"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.2",
-    "@skaldapp/configs": "^1.2.105",
+    "@skaldapp/configs": "^1.2.106",
     "@types/markdown-it": "^14.1.2",
-    "@types/node": "^25.6.0",
+    "@types/node": "^25.7.0",
     "eslint": "^10.3.0",
     "jsonc-parser": "^3.3.1",
     "path-browserify": "^1.0.1",
-    "vite": "^8.0.11"
+    "vite": "^8.0.12"
   }
 }

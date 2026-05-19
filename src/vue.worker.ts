@@ -1,5 +1,6 @@
 import type {
   LanguageServiceContext,
+  SourceScript,
   WorkerLanguageService,
 } from "@volar/monaco/worker";
 import type { Language } from "@vue/language-core";
@@ -19,6 +20,7 @@ import { collectExtractProps } from "@vue/typescript-plugin/lib/requests/collect
 import { getComponentDirectives } from "@vue/typescript-plugin/lib/requests/getComponentDirectives";
 import { getComponentMeta } from "@vue/typescript-plugin/lib/requests/getComponentMeta";
 import { getComponentNames } from "@vue/typescript-plugin/lib/requests/getComponentNames";
+import { getComponentProps } from "@vue/typescript-plugin/lib/requests/getComponentProps";
 import { getComponentSlots } from "@vue/typescript-plugin/lib/requests/getComponentSlots";
 import { getElementAttrs } from "@vue/typescript-plugin/lib/requests/getElementAttrs";
 import { getElementNames } from "@vue/typescript-plugin/lib/requests/getElementNames";
@@ -97,18 +99,20 @@ const asFileName = ({ path }: URI) => path,
     fileName: string,
     { languageService: { context } }: WorkerLanguageService,
   ) => {
-    const { language } = context;
-    const languageServiceHost = context.inject(
-        "typescript/languageServiceHost",
-      ),
-      program = context.inject("typescript/languageService").getProgram(),
-      sourceScript = language.scripts.get(asUri(fileName)),
+    const languageService = context.inject("typescript/languageService"),
+      languageServiceHost = context.inject("typescript/languageServiceHost"),
+      program = languageService.getProgram(),
+      { language } = context,
+      sourceScript = language.scripts.get(asUri(fileName)) as
+        | SourceScript<string>
+        | undefined,
       virtualCode =
         sourceScript?.generated?.root instanceof VueVirtualCode
           ? sourceScript.generated.root
           : undefined;
     return {
       language,
+      languageService,
       languageServiceHost,
       program,
       sourceScript,
@@ -212,6 +216,28 @@ self.onmessage = () => {
               virtualCode && getComponentNames(typescript, program, virtualCode)
             );
           },
+          getComponentProps: (fileName, position) => {
+            const {
+              language,
+              languageService,
+              program,
+              sourceScript,
+              virtualCode,
+            } = useContext(fileName, workerLanguageService);
+            return (
+              virtualCode &&
+              sourceScript &&
+              getComponentProps(
+                typescript,
+                languageService,
+                program,
+                language,
+                sourceScript,
+                virtualCode,
+                position,
+              )
+            );
+          },
           getComponentSlots(fileName) {
             const { program, virtualCode } = useContext(
               fileName,
@@ -231,11 +257,12 @@ self.onmessage = () => {
             return getElementNames(typescript, program, fileName);
           },
           getEncodedSemanticClassifications: () => undefined,
-          getImportPathForFile: (fileName, incomingFileName, preferences) => {
-            const { languageServiceHost, program } = useContext(
-              fileName,
-              workerLanguageService,
-            );
+          getImportPathForFile: (fileName, incomingFileName) => {
+            const preferences = {},
+              { languageServiceHost, program } = useContext(
+                fileName,
+                workerLanguageService,
+              );
             return getImportPathForFile(
               typescript,
               languageServiceHost,

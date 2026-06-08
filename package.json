@@ -54,23 +54,23 @@
     "@remote-dom/polyfill": "^1.5.1",
     "@volar/jsdelivr": "^2.4.28",
     "@volar/monaco": "^2.4.28",
-    "@vue/language-core": "^3.3.3",
-    "@vue/language-service": "^3.3.3",
-    "@vue/typescript-plugin": "^3.3.3",
+    "@vue/language-core": "^3.3.4",
+    "@vue/language-service": "^3.3.4",
+    "@vue/typescript-plugin": "^3.3.4",
     "monaco-editor": "0.52.2",
     "typescript": "^6.0.3",
     "volar-service-typescript": "^0.0.71",
-    "vscode-languageserver-protocol": "^3.17.5",
+    "vscode-languageserver-protocol": "^3.18.0",
     "vscode-uri": "^3.1.0"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.3",
-    "@skaldapp/configs": "^1.4.0",
+    "@skaldapp/configs": "^1.4.3",
     "@types/markdown-it": "^14.1.2",
-    "@types/node": "^25.9.1",
+    "@types/node": "^25.9.2",
     "eslint": "^10.4.1",
     "jsonc-parser": "^3.3.1",
     "path-browserify": "^1.0.1",
-    "vite": "^8.0.14"
+    "vite": "^8.0.16"
   }
 }

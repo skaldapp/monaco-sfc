@@ -28,7 +28,10 @@ import { getImportPathForFile } from "@vue/typescript-plugin/lib/requests/getImp
 import { isRefAtPosition } from "@vue/typescript-plugin/lib/requests/isRefAtPosition";
 import { resolveModuleName } from "@vue/typescript-plugin/lib/requests/resolveModuleName";
 import { initialize } from "monaco-editor/esm/vs/editor/editor.worker";
-import typescript, { convertCompilerOptionsFromJson } from "typescript";
+import typescript, {
+  convertCompilerOptionsFromJson,
+  version,
+} from "typescript";
 import { create as createTypeScriptDirectiveCommentPlugin } from "volar-service-typescript/lib/plugins/directiveComment";
 import { create as createTypeScriptSemanticPlugin } from "volar-service-typescript/lib/plugins/semantic";
 import { MarkupContent } from "vscode-languageserver-protocol";
@@ -51,7 +54,9 @@ declare module 'vue' {
 }
 export {};`,
   mtime = ctime,
-  npmFileSystem = createNpmFileSystem(),
+  npmFileSystem = createNpmFileSystem(undefined, (pkgName) =>
+    pkgName === "typescript" ? version : undefined,
+  ),
   semanticPlugin = createTypeScriptSemanticPlugin(typescript),
   size = globalDeclarations.length,
   type = 1,
@@ -104,8 +109,7 @@ const asFileName = ({ path }: URI) => path,
       program = languageService.getProgram(),
       { language } = context,
       sourceScript = language.scripts.get(asUri(fileName)) as
-        | SourceScript<string>
-        | undefined,
+        SourceScript<string> | undefined,
       virtualCode =
         sourceScript?.generated?.root instanceof VueVirtualCode
           ? sourceScript.generated.root
@@ -125,18 +129,10 @@ const asFileName = ({ path }: URI) => path,
       allowJs: true,
       checkJs: true,
       jsx: "Preserve",
-      lib: [
-        "ESNext",
-        "ESNext.AsyncIterable",
-        "ESNext.Array",
-        "ESNext.Intl",
-        "ESNext.Symbol",
-        "ES2023",
-        "DOM",
-        "DOM.Iterable",
-      ],
+      lib: ["ESNext", "DOM"],
       module: "ESNext",
       moduleResolution: "Bundler",
+      strict: false,
       target: "ESNext",
       types: [global],
     },

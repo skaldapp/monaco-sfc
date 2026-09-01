@@ -60,15 +60,15 @@
     "monaco-editor": "0.52.2",
     "typescript": "^6.0.3",
     "volar-service-typescript": "^0.0.71",
-    "vscode-languageserver-protocol": "^3.18.2",
-    "vscode-uri": "^3.1.0"
+    "vscode-languageserver-protocol": "^3.18.3",
+    "vscode-uri": "^3.2.0"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.3",
-    "@skaldapp/configs": "^1.6.1",
+    "@skaldapp/configs": "^1.6.2",
     "@types/markdown-it": "^14.2.0",
-    "@types/node": "^26.2.0",
-    "eslint": "^10.9.0",
+    "@types/node": "^26.4.0",
+    "eslint": "^10.9.1",
     "jsonc-parser": "^3.3.1",
     "path-browserify": "^1.0.1",
     "vite": "^8.2.2"

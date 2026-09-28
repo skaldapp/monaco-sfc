@@ -65,9 +65,9 @@
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.3",
-    "@skaldapp/configs": "^1.7.1",
+    "@skaldapp/configs": "^1.7.2",
     "@types/markdown-it": "^14.2.0",
-    "@types/node": "^26.6.2",
+    "@types/node": "^26.6.3",
     "eslint": "^10.11.0",
     "jsonc-parser": "^3.3.1",
     "path-browserify": "^1.0.1",
